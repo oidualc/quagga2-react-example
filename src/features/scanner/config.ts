@@ -1,0 +1,1 @@
+export const decoders = ["code_39_reader", "code_128_reader"];
