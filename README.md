@@ -2,17 +2,7 @@
 
 Showcasing Quagga2 in combination with ReactJS TypeScript v18+.
 
-## Installation
-
-Install dependencies with pnpm:
-
-```
-pnpm install
-```
-
-## Usage
-
-### Using Docker
+## Usage with Docker
 
 Run
 
@@ -23,12 +13,23 @@ docker build -t quagga2-react-example:1 .
 then
 
 ```
-docker run -p 80:80 quagga2-react-example
+docker run -p 80:80 quagga2-react-example:1
 ```
 
 and open `http://localhost/` in your browser.
 
-### Using Local deployment
+## Usage with local installation
+
+### Requirements
+
+- NodeJS v18+
+- pnpm v7+
+
+Install dependencies with pnpm:
+
+```
+pnpm install
+```
 
 Start the dev server with:
 
