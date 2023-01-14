@@ -2,7 +2,7 @@ import Quagga, {
   QuaggaJSConfigObject,
   QuaggaJSResultObject,
 } from "@ericblade/quagga2";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { decoders } from "../config";
 
 const useScanner = (onDetected: (code: string) => void) => {
@@ -19,7 +19,7 @@ const useScanner = (onDetected: (code: string) => void) => {
     }
   };
 
-  const errorCheck = (result: QuaggaJSResultObject) => {
+  const errorCheck = useCallback((result: QuaggaJSResultObject) => {
     if (!onDetected) {
       return;
     }
@@ -30,17 +30,17 @@ const useScanner = (onDetected: (code: string) => void) => {
     if ((err < 0.25 || isNaN(err)) && result.codeResult.code) {
       onDetected(result.codeResult.code);
     }
-  };
+  }, [onDetected]);
 
   const startScanner = async () => {
     await Quagga.init(getConfig(scannerRef.current ?? undefined), callback);
     Quagga.onDetected(errorCheck);
   };
 
-  const stopScanner = async () => {
+  const stopScanner = useCallback(async () => {
     Quagga.offDetected(errorCheck);
     await Quagga.stop();
-  };
+  }, [errorCheck]);
 
   useEffect(() => {
     if (!isQuaggaInitializedRef.current) {
@@ -53,7 +53,7 @@ const useScanner = (onDetected: (code: string) => void) => {
     return () => {
       stopScanner();
     };
-  }, [onDetected]);
+  }, [errorCheck, stopScanner]);
 
   return { scannerRef, startScanner, stopScanner };
 };
