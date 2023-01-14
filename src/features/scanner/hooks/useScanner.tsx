@@ -19,18 +19,21 @@ const useScanner = (onDetected: (code: string) => void) => {
     }
   };
 
-  const errorCheck = useCallback((result: QuaggaJSResultObject) => {
-    if (!onDetected) {
-      return;
-    }
+  const errorCheck = useCallback(
+    (result: QuaggaJSResultObject) => {
+      if (!onDetected) {
+        return;
+      }
 
-    const err = getMedianOfCodeErrors(result.codeResult.decodedCodes);
+      const err = getMedianOfCodeErrors(result.codeResult.decodedCodes);
 
-    // if Quagga is at least 75% certain that it read correctly, then accept the code.
-    if ((err < 0.25 || isNaN(err)) && result.codeResult.code) {
-      onDetected(result.codeResult.code);
-    }
-  }, [onDetected]);
+      // if Quagga is at least 75% certain that it read correctly, then accept the code.
+      if ((err < 0.25 || isNaN(err)) && result.codeResult.code) {
+        onDetected(result.codeResult.code);
+      }
+    },
+    [onDetected]
+  );
 
   const startScanner = async () => {
     await Quagga.init(getConfig(scannerRef.current ?? undefined), callback);
