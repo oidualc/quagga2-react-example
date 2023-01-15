@@ -6,7 +6,9 @@ import { useCallback, useEffect, useRef } from "react";
 import { decoders } from "../config";
 
 const useScanner = (onDetected: (code: string) => void) => {
-  const isQuaggaInitializedRef = useRef(false);
+  // It's important to only initialize Quagga when video track resources are correctly freed after a Quagga.stop()
+  // otherwise it will open multiple camera streams that will not be closed when calling Quagga.stop()
+  const isQuaggaInitBlockedRef = useRef(false);
 
   const scannerRef = useRef<HTMLDivElement | null>(null);
 
@@ -36,23 +38,33 @@ const useScanner = (onDetected: (code: string) => void) => {
   );
 
   const startScanner = async () => {
-    await Quagga.init(getConfig(scannerRef.current ?? undefined), callback);
+    if (!scannerRef.current) {
+      throw new Error("Cannot start scanner without a target");
+    } else if (isQuaggaInitBlockedRef.current) {
+      throw new Error("Cannot init scanner while it is already running");
+    }
+
+    const config = getConfig(scannerRef.current);
+    Quagga.init(config, callback);
+    isQuaggaInitBlockedRef.current = true;
+
     Quagga.onDetected(errorCheck);
   };
 
   const stopScanner = useCallback(async () => {
     Quagga.offDetected(errorCheck);
     await Quagga.stop();
+    isQuaggaInitBlockedRef.current = false;
   }, [errorCheck]);
 
   useEffect(() => {
-    if (!isQuaggaInitializedRef.current) {
-      // It's important to initialize Quagga only once, otherwise it will open
-      // multiple camera streams that will not be closed when calling Quagga.stop()
-      Quagga.init(getConfig(scannerRef.current ?? undefined), callback);
-      isQuaggaInitializedRef.current = true;
+    if (!isQuaggaInitBlockedRef.current && scannerRef.current != null) {
+      const config = getConfig(scannerRef.current);
+      Quagga.init(config, callback);
+      isQuaggaInitBlockedRef.current = true;
+
+      Quagga.onDetected(errorCheck);
     }
-    Quagga.onDetected(errorCheck);
     return () => {
       stopScanner();
     };
