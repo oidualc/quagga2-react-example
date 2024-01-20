@@ -9,7 +9,10 @@ export default function Main() {
 
   const onDetected = useCallback((code: string) => setCode(code), []);
 
-  const { scannerRef, startScanner, stopScanner } = useScanner(onDetected);
+  const { scannerRef, startScanner, stopScanner } = useScanner(
+    onDetected,
+    true,
+  );
 
   const onClick = () => {
     if (play) {
