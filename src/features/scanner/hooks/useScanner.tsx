@@ -5,7 +5,7 @@ import Quagga, {
 import { useCallback, useEffect, useRef } from "react";
 import { decoders } from "../config";
 
-const useScanner = (onDetected: (code: string) => void) => {
+export default function useScanner(onDetected: (code: string) => void) {
   // It's important to only initialize Quagga when video track resources are correctly freed after a Quagga.stop()
   // otherwise it will open multiple camera streams that will not be closed when calling Quagga.stop()
   const isQuaggaInitBlockedRef = useRef(false);
@@ -14,8 +14,10 @@ const useScanner = (onDetected: (code: string) => void) => {
 
   const callback = (err: unknown) => {
     if (err) {
-      return console.error("Error starting Quagga:", err);
+      alert(`Error starting Quagga: ${err}`);
+      return;
     }
+
     if (scannerRef?.current) {
       Quagga.start();
     }
@@ -34,7 +36,7 @@ const useScanner = (onDetected: (code: string) => void) => {
         onDetected(result.codeResult.code);
       }
     },
-    [onDetected]
+    [onDetected],
   );
 
   const startScanner = async () => {
@@ -71,9 +73,9 @@ const useScanner = (onDetected: (code: string) => void) => {
   }, [errorCheck, stopScanner]);
 
   return { scannerRef, startScanner, stopScanner };
-};
+}
 
-const getConfig = (target?: string | Element): QuaggaJSConfigObject => {
+function getConfig(target?: string | Element): QuaggaJSConfigObject {
   return {
     inputStream: {
       type: "LiveStream",
@@ -98,25 +100,23 @@ const getConfig = (target?: string | Element): QuaggaJSConfigObject => {
     decoder: { readers: decoders },
     locate: true,
   };
-};
+}
 
-const getMedian = (arr: number[]) => {
+function getMedian(arr: number[]) {
   arr.sort((a, b) => a - b);
   const half = Math.floor(arr.length / 2);
   if (arr.length % 2 === 1) {
     return arr[half];
   }
   return (arr[half - 1] + arr[half]) / 2;
-};
+}
 
-const getMedianOfCodeErrors = (
-  decodedCodes: QuaggaJSResultObject["codeResult"]["decodedCodes"]
-) => {
+function getMedianOfCodeErrors(
+  decodedCodes: QuaggaJSResultObject["codeResult"]["decodedCodes"],
+) {
   const errors = decodedCodes
     .filter((x) => x.error != null)
     .map((x) => x.error!);
   const medianOfErrors = getMedian(errors);
   return medianOfErrors;
-};
-
-export default useScanner;
+}

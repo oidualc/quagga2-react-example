@@ -3,7 +3,7 @@ import Scanner from "../features/scanner/components/Scanner";
 import useScanner from "../features/scanner/hooks/useScanner";
 import styles from "./Main.module.css";
 
-const Main = () => {
+export default function Main() {
   const [play, setPlay] = useState(true);
   const [code, setCode] = useState<string | null>(null);
 
@@ -24,20 +24,20 @@ const Main = () => {
   const detectedText = code
     ? `Detected code: ${code}`
     : play
-    ? "Scanning..."
-    : "Stopped";
+      ? "Scanning..."
+      : "Stopped";
 
   return (
     <main>
       <section className={styles.section}>
         <button onClick={onClick}>Start / Stop</button>
+
         {detectedText}
+
         <div className={styles["scan-area"]}>
           <Scanner scannerRef={scannerRef} />
         </div>
       </section>
     </main>
   );
-};
-
-export default Main;
+}

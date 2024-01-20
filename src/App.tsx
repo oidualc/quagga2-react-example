@@ -1,7 +1,5 @@
 import Main from "./pages/Main";
 
-const App = () => {
+export default function App() {
   return <Main />;
-};
-
-export default App;
+}

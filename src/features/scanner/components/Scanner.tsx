@@ -5,8 +5,6 @@ type ScannerProps = {
   scannerRef: RefObject<HTMLDivElement>;
 };
 
-const Scanner = ({ scannerRef }: ScannerProps) => {
-  return <div ref={scannerRef} className={styles["barcode-scanner"]}></div>;
-};
-
-export default Scanner;
+export default function Scanner({ scannerRef }: ScannerProps) {
+  return <div ref={scannerRef} className={styles["barcode-scanner"]} />;
+}
