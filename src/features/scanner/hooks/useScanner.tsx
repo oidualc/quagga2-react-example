@@ -9,8 +9,9 @@ export default function useScanner(
   onDetected: (code: string) => void,
   autoStart = false,
 ) {
-  // It's important to only initialize Quagga when video track resources are correctly freed after a Quagga.stop()
-  // otherwise it will open multiple camera streams that will not be closed when calling Quagga.stop()
+  // It's important to only initialize Quagga when video track resources are
+  // correctly freed after a Quagga.stop() otherwise it will open multiple
+  // camera streams that will not be closed when calling Quagga.stop()
   const isQuaggaInitBlockedRef = useRef(false);
 
   const scannerRef = useRef<HTMLDivElement | null>(null);
@@ -27,8 +28,14 @@ export default function useScanner(
     [onDetected],
   );
 
-  const startScannerInternal = useCallback(() => {
-    const config = getConfig(scannerRef.current!);
+  const startScanner = useCallback(async () => {
+    if (!scannerRef.current) {
+      throw new Error("Cannot start scanner without a target");
+    } else if (isQuaggaInitBlockedRef.current) {
+      throw new Error("Cannot init scanner while it is already running");
+    }
+
+    const config = getConfig(scannerRef.current);
     Quagga.init(config, (err: unknown) => {
       if (err) {
         alert(`Error starting Quagga: ${err}`);
@@ -39,18 +46,8 @@ export default function useScanner(
     });
     isQuaggaInitBlockedRef.current = true;
 
-    Quagga.onDetected(handleDetected);
+    Quagga.onDetected((data) => handleDetected(data));
   }, [handleDetected]);
-
-  const startScanner = async () => {
-    if (!scannerRef.current) {
-      throw new Error("Cannot start scanner without a target");
-    } else if (isQuaggaInitBlockedRef.current) {
-      throw new Error("Cannot init scanner while it is already running");
-    }
-
-    startScannerInternal();
-  };
 
   const stopScanner = useCallback(async () => {
     Quagga.offDetected(handleDetected);
@@ -63,12 +60,12 @@ export default function useScanner(
       return;
     }
 
-    startScannerInternal();
+    startScanner();
 
     return () => {
       stopScanner();
     };
-  }, [autoStart, startScannerInternal, stopScanner]);
+  }, [autoStart, startScanner, stopScanner]);
 
   return { scannerRef, startScanner, stopScanner };
 }
