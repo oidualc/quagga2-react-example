@@ -11,7 +11,7 @@ export default function useScanner(
 ) {
   // It's important to only initialize Quagga when video track resources are
   // correctly freed after a Quagga.stop() otherwise it will open multiple
-  // camera streams that will not be closed when calling Quagga.stop()
+  // camera streams that are not closed when Quagga.stop() is called
   const isQuaggaInitBlockedRef = useRef(false);
 
   const scannerRef = useRef<HTMLDivElement | null>(null);

@@ -34,7 +34,7 @@ pnpm install
 Start the dev server with:
 
 ```
-pnpm run dev
+pnpm dev
 ```
 
 then open `http://localhost:5173/` in your browser. When a code is detected it will appear on the screen.
