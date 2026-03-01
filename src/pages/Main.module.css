@@ -12,3 +12,18 @@
   width: 50rem;
   height: 28.125rem;
 }
+
+.barcode-scanner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.barcode-scanner video {
+  width: 100%;
+  height: 100%;
+}
+
+.barcode-scanner canvas {
+  display: none;
+}
