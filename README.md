@@ -39,5 +39,5 @@ pnpm dev
 
 then open `http://localhost:5173/` in your browser. When a code is detected it will appear on the screen.
 
-To configure the decoders types edit [src/features/scanner/config.ts](src/features/scanner/config.ts).  
+To configure the decoders types edit [src/pages/decoders.ts](src/pages/decoders.ts).  
 You can find the available decoders on [https://github.com/ericblade/quagga2#decoder](https://github.com/ericblade/quagga2#decoder).

@@ -1,16 +1,18 @@
 import Quagga, {
-  QuaggaJSCodeReader,
   QuaggaJSConfigObject,
   QuaggaJSResultCallbackFunction,
   QuaggaJSResultObject,
 } from "@ericblade/quagga2";
 import { useEffect, useRef, useState } from "react";
 import styles from "./Main.module.css";
+import { DECODER_READERS } from "./decoders";
 
 export default function Main() {
   const scannerRef = useRef<HTMLDivElement | null>(null);
 
-  const [scannerState, setScannerState] = useState<"scanning" | "stopped">("scanning");
+  const [scannerState, setScannerState] = useState<"scanning" | "stopped">(
+    "scanning",
+  );
 
   const [code, setCode] = useState<string | null>(null);
 
@@ -31,7 +33,7 @@ export default function Main() {
     }
 
     await startQuagga(scannerRef.current!, handleDetected);
-    setScannerState("scanning")
+    setScannerState("scanning");
   };
 
   const stopScanner = async () => {
@@ -51,7 +53,7 @@ export default function Main() {
       quaggaInitializingRef.current = false;
 
       setScannerState("scanning");
-    }
+    };
 
     const stop = async () => {
       if (quaggaInitializingRef.current) {
@@ -62,7 +64,7 @@ export default function Main() {
       await stopQuagga(handleDetected, () => {
         setScannerState("stopped");
       });
-    }
+    };
 
     init();
 
@@ -107,11 +109,6 @@ function DecodedText({
 }
 
 function buildConfig(target: string | Element): QuaggaJSConfigObject {
-  const DECODER_READERS: QuaggaJSCodeReader[] = [
-    "code_39_reader",
-    "code_128_reader",
-  ];
-
   return {
     inputStream: {
       type: "LiveStream",
@@ -158,7 +155,10 @@ async function startQuagga(
   Quagga.onDetected(detectHandler);
 }
 
-async function stopQuagga(detectHandler: QuaggaJSResultCallbackFunction, onStopped?: () => void) {
+async function stopQuagga(
+  detectHandler: QuaggaJSResultCallbackFunction,
+  onStopped?: () => void,
+) {
   await Quagga.stop();
   Quagga.offDetected(detectHandler);
 
